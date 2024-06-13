@@ -327,9 +327,6 @@ from datasets import load_dataset
 import nltk
 from tqdm import tqdm
 
-# Download the NLTK data required for BLEU
-nltk.download('punkt')
-
 # Step 2: Set the path to your model in Google Drive
 model_path = '/content/drive/MyDrive/trained_medical_chatbot'  # Replace with your model's path in Google Drive
 
