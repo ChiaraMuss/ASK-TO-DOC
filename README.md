@@ -316,13 +316,16 @@ _tensors='pt').to(device)
        main()
    ```
 
+Sure, here is the adjusted section of your README for the evaluation part:
+
+```markdown
 ### Evaluating the Model
 
 1. **Evaluation Metrics**
 
-   The model is evaluated using Averege Loss, Perplexity, BLEU and ROUGE scores to assess the quality of generated responses.
+   The model is evaluated using Average Loss, Perplexity, BLEU, and ROUGE scores to assess the quality of generated responses.
 
-1. **Evaluation Script for Perplexity and Average Loss**
+2. **Evaluation Script for Perplexity and Average Loss**
 
    ```python
    # Step 1: Mount Google Drive
@@ -348,9 +351,7 @@ _tensors='pt').to(device)
    print(dataset)
 
    # Split the 'train' dataset into 'train' and 'validation' subsets
-   split
-
- = dataset['train'].train_test_split(test_size=0.1)
+   split = dataset['train'].train_test_split(test_size=0.1)
    train_dataset_full = split['train']
    eval_dataset = split['test']
 
@@ -414,7 +415,7 @@ _tensors='pt').to(device)
    evaluate_model(model, tokenizer, eval_loader)
    ```
 
-2. **Evaluation Script for BLEU and ROUGE Scores**
+3. **Evaluation Script for BLEU and ROUGE Scores**
 
    ```python
    import torch
@@ -549,6 +550,7 @@ _tensors='pt').to(device)
    # Evaluate the model with manual inspection
    evaluate_model(model, tokenizer, eval_loader)
    ```
+```
 
 
 2. **Results**
