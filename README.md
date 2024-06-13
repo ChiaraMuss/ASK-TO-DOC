@@ -219,93 +219,101 @@
    - Create a new bot using the BotFather on Telegram and get the API token.
 
 2. **Run the Flask App**
-
-   ```python
+```python
    import logging
-import os
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+   import os
+   from telegram import Update
+   from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+   import torch
+   from transformers import AutoTokenizer, AutoModelForCausalLM
 
-# Set device to GPU if available
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print(f'Using device: {device}')
+   # Set device to GPU if available
+   device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+   print(f'Using device: {device}')
 
-# Load tokenizer and model from the saved directory
-tokenizer = AutoTokenizer.from_pretrained('./trained_medical_chatbot3epoch')
-model = AutoModelForCausalLM.from_pretrained('./trained_medical_chatbot3epoch').to(device)
+   # Load tokenizer and model from the saved directory
+   tokenizer = AutoTokenizer.from_pretrained('./trained_medical_chatbot3epoch')
+   model = AutoModelForCausalLM.from_pretrained('./trained_medical_chatbot3epoch').to(device)
 
-# Set up logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+   # Set up logging
+   logging.basicConfig(
+       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+       level=logging.INFO
+   )
 
-logger = logging.getLogger(__name__)
+   logger = logging.getLogger(__name__)
 
-def start(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi! I am your medical chatbot. How can I help you today?')
+   def start(update: Update, context: CallbackContext) -> None:
+       """Send a message when the command /start is issued."""
+       update.message.reply_text('Hi! I am your medical chatbot. How can I help you today?')
 
-def generate_response(patient_text):
-    # Tokenize the input text
-    input_text = f"Patient: {patient_text} Doctor:"
-    input_ids = tokenizer.encode(input_text, return_tensors='pt').to(device)
+   def generate_response(patient_text):
+       # Tokenize the input text
+       input_text = f"Patient: {patient_text} Doctor:"
+       input_ids = tokenizer.encode(input_text, return
 
-    # Generate a response from the model
-    with torch.no_grad():
-        output_ids = model.generate(
-            input_ids,
-            max_length=150,
-            num_beams=5,
-            no_repeat_ngram_size=3,
-            early_stopping=True,
-            pad_token_id=tokenizer.eos_token_id,
-            temperature=0.7,
-            top_k=50,
-            top_p=0.95,
-            do_sample=True  # Enable sampling
-        )
+_tensors='pt').to(device)
 
-    # Decode the generated tokens into text
-    response = tokenizer.decode(output_ids[0], skip_special_tokens=True)
-    # Extract only the doctor's response part
-    response = response.split("Doctor:")[-1].strip()
-    return response
+       # Generate a response from the model
+       with torch.no_grad():
+           output_ids = model.generate(
+               input_ids,
+               max_length=150,
+               num_beams=5,
+               no_repeat_ngram_size=3,
+               early_stopping=True,
+               pad_token_id=tokenizer.eos_token_id,
+               temperature=0.7,
+               top_k=50,
+               top_p=0.95,
+               do_sample=True  # Enable sampling
+           )
 
-def respond(update: Update, context: CallbackContext) -> None:
-    """Generate a response to the user's message."""
-    patient_input = update.message.text
+       # Decode the generated tokens into text
+       response = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+       # Extract only the doctor's response part
+       response = response.split("Doctor:")[-1].strip()
+       return response
 
-    # Check for gratitude messages
-    if any(gratitude in patient_input.lower() for gratitude in ['thanks', 'thank you', 'thank', 'thx']):
-        update.message.reply_text("You're welcome! If you have any other questions, feel free to ask.")
+   def respond(update: Update, context: CallbackContext) -> None:
+       """Generate a response to the user's message."""
+       patient_input = update.message.text
 
-def main():
-    """Start the bot."""
-    # Get bot token from environment variable for security
+       # Check for gratitude messages
+       if any(gratitude in patient_input.lower() for gratitude in ['thanks', 'thank you', 'thank', 'thx']):
+           update.message.reply_text("You're welcome! If you have any other questions, feel free to ask.")
+       else:
+           response = generate_response(patient_input)
+           # basic answers
+           if "headache" in patient_input.lower():
+               response = "I'm sorry to hear that you're experiencing headaches. Headaches can be caused by various factors, including stress, dehydration, or lack of sleep. If your headaches persist, I recommend consulting a healthcare professional."
+           elif "tired" in patient_input.lower():
+               response = "Feeling tired can be due to many reasons, such as lack of sleep, stress, or even an underlying medical condition. Make sure you're getting enough rest, eating well, and staying hydrated. If your fatigue continues, consider visiting a doctor."
+           elif "sore throat" in patient_input.lower() or "cough" in patient_input.lower():
+               response = "A sore throat and cough can often be symptoms of a viral infection like the common cold. Make sure to stay hydrated, rest, and consider over-the-counter remedies. If your symptoms worsen or persist for more than a week, please see a doctor."
+           update.message.reply_text(response)
 
+   def main():
+       """Start the bot."""
+       # Get bot token from environment variable for security
+       updater = Updater('your-telegram-bot-token', use_context=True)
 
-    updater = Updater('YOUR_API', use_context=True)
+       # Get the dispatcher to register handlers
+       dp = updater.dispatcher
 
-    # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+       # Register the handlers
+       dp.add_handler(CommandHandler("start", start))
+       dp.add_handler(MessageHandler(Filters.text & ~Filters.command, respond))
 
-    # Register the handlers
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, respond))
+       # Start the Bot
+       updater.start_polling()
 
-    # Start the Bot
-    updater.start_polling()
+       # Run the bot until you press Ctrl-C or the process receives SIGINT,
+       # SIGTERM or SIGABRT
+       updater.idle()
 
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT
-    updater.idle()
-
-if __name__ == '__main__':
-    main()
-
+   if __name__ == '__main__':
+       main()
    ```
 
 ### Evaluating the Model
@@ -580,6 +588,22 @@ Future plans for the **ASK TO DOC** chatbot include:
 - Continuous performance monitoring and improvement
 - Collaborating with medical professionals
 
+## Acknowledgements
+
+This research received support during the Applies Natural Language Processing course, instructed by Professors Staiano Jacopo and Penzo Nicolò.
+
+## References
+
+- **Microsoft/DialoGPT-small**: [DialoGPT: Large-Scale Generative Pre-training for Conversational Response Generation](https://arxiv.org/abs/1911.00536)
+- **Hugging Face Transformers**: [Transformers Documentation](https://huggingface.co/transformers/)
+- **TensorBoard**: [TensorBoard Documentation](https://www.tensorflow.org/tensorboard)
+- **Microsoft/DialoGPT-small**: [DialoGPT: Large-Scale Generative Pre-training for Conversational Response Generation](https://arxiv.org/abs/1911.00536)
+- **Hugging Face Transformers**: [Transformers Documentation](https://huggingface.co/transformers/)
+- **TensorBoard**: [TensorBoard Documentation](https://www.tensorflow.org/tensorboard)
+- **BLEU Score**: [BLEU: A Method for Automatic Evaluation of Machine Translation](https://www.aclweb.org/anthology/P02-1040/)
+- **ROUGE Score**: [ROUGE: A Package for Automatic Evaluation of Summaries](https://www.aclweb.org/anthology/W04-1013/)
+- **JWT Authentication**: [JSON Web Tokens Introduction](https://jwt.io/introduction/)
+- **Cryptography**: [Cryptography Documentation](https://cryptography.io/en/latest/)
 
 
 Feel free to contribute to the project or report any issues you encounter. Your feedback is invaluable for the continuous improvement of **ASK TO DOC**.
