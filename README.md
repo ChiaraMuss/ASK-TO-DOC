@@ -213,7 +213,7 @@ for epoch in range(num_epochs):
 model.save_pretrained('/content/drive/MyDrive/trained_medical_chatbot')
 tokenizer.save_pretrained('/content/drive/MyDrive/trained_medical_chatbot')
 
-   ```
+```
 
 ### Integrating with Telegram
 
