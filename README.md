@@ -9,7 +9,7 @@
 - **Extensive Training Dataset**: Trained on the RUSLANMV/AI-MEDICAL-CHATBOT dataset with over 250,000 dialogues.
 - **Optimized Training Techniques**: Employs gradient accumulation, mixed precision training, and subset sampling.
 - **Seamless Telegram Integration**: Provides easy access and interaction through the Telegram API.
-- **Robust Security Measures**: Ensures data protection, secure communication, and compliance with regulations.
+- **Ideas for Security Measures**: Ensures data protection, secure communication, and compliance with regulations.
 
 ## Installation
 
