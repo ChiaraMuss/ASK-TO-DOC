@@ -547,7 +547,8 @@ _tensors='pt').to(device)
    # Evaluate the model with manual inspection
    evaluate_model(model, tokenizer, eval_loader)
    ```
-```
+
+
 
 
 2. **Results**
