@@ -82,63 +82,91 @@ ASK TO DOC: Leveraging AI for Accessible and Reliable Medical Advice
 2. **Run the Flask App**
 
    ```python
-   from flask import Flask, request, jsonify
-   from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
-   from cryptography.fernet import Fernet
-   import os
+   import logging
+import os
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
-   app = Flask(__name__)
+# Set device to GPU if available
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(f'Using device: {device}')
 
-   # Configuration for JWT
-   app.config['JWT_SECRET_KEY'] = 'super-secret-key'  # Change this in production
-   jwt = JWTManager(app)
+# Load tokenizer and model from the saved directory
+tokenizer = AutoTokenizer.from_pretrained('./trained_medical_chatbot3epoch')
+model = AutoModelForCausalLM.from_pretrained('./trained_medical_chatbot3epoch').to(device)
 
-   # Generate a key for encryption
-   encryption_key = Fernet.generate_key()
-   cipher_suite = Fernet(encryption_key)
+# Set up logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
-   # In-memory user data
-   users = {
-       "user1": {"password": "password1"},
-   }
+logger = logging.getLogger(__name__)
 
-   # Endpoint to authenticate users and return a JWT
-   @app.route('/login', methods=['POST'])
-   def login():
-       username = request.json.get('username', None)
-       password = request.json.get('password', None)
-       if username not in users or users[username]['password'] != password:
-           return jsonify({"msg": "Bad username or password"}), 401
+def start(update: Update, context: CallbackContext) -> None:
+    """Send a message when the command /start is issued."""
+    update.message.reply_text('Hi! I am your medical chatbot. How can I help you today?')
 
-       access_token = create_access_token(identity=username)
-       return jsonify(access_token=access_token)
+def generate_response(patient_text):
+    # Tokenize the input text
+    input_text = f"Patient: {patient_text} Doctor:"
+    input_ids = tokenizer.encode(input_text, return_tensors='pt').to(device)
 
-   # Secure endpoint that requires authentication
-   @app.route('/chat', methods=['POST'])
-   @jwt_required()
-   def chat():
-       current_user = get_jwt_identity()
-       message = request.json.get('message', '')
-       
-       # Encrypt the message
-       encrypted_message = cipher_suite.encrypt(message.encode())
-       
-       # Decrypt the message (for demonstration)
-       decrypted_message = cipher_suite.decrypt(encrypted_message).decode()
-       
-       response = f"Received your message, {current_user}. You said: {decrypted_message}"
-       return jsonify({"response": response})
+    # Generate a response from the model
+    with torch.no_grad():
+        output_ids = model.generate(
+            input_ids,
+            max_length=150,
+            num_beams=5,
+            no_repeat_ngram_size=3,
+            early_stopping=True,
+            pad_token_id=tokenizer.eos_token_id,
+            temperature=0.7,
+            top_k=50,
+            top_p=0.95,
+            do_sample=True  # Enable sampling
+        )
 
-   # Endpoint for users to get their data (example of data minimization)
-   @app.route('/userdata', methods=['GET'])
-   @jwt_required()
-   def get_userdata():
-       current_user = get_jwt_identity()
-       # Only return minimal necessary data
-       return jsonify({"username": current_user})
+    # Decode the generated tokens into text
+    response = tokenizer.decode(output_ids[0], skip_special_tokens=True)
+    # Extract only the doctor's response part
+    response = response.split("Doctor:")[-1].strip()
+    return response
 
-   if __name__ == '__main__':
-       app.run(ssl_context='adhoc')
+def respond(update: Update, context: CallbackContext) -> None:
+    """Generate a response to the user's message."""
+    patient_input = update.message.text
+
+    # Check for gratitude messages
+    if any(gratitude in patient_input.lower() for gratitude in ['thanks', 'thank you', 'thank', 'thx']):
+        update.message.reply_text("You're welcome! If you have any other questions, feel free to ask.")
+
+def main():
+    """Start the bot."""
+    # Get bot token from environment variable for security
+
+
+    updater = Updater('YOUR_API', use_context=True)
+
+    # Get the dispatcher to register handlers
+    dp = updater.dispatcher
+
+    # Register the handlers
+    dp.add_handler(CommandHandler("start", start))
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, respond))
+
+    # Start the Bot
+    updater.start_polling()
+
+    # Run the bot until you press Ctrl-C or the process receives SIGINT,
+    # SIGTERM or SIGABRT
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
+
    ```
 
 ### Evaluating the Model
