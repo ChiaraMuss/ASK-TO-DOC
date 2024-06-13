@@ -316,9 +316,6 @@ _tensors='pt').to(device)
        main()
    ```
 
-Sure, here is the adjusted section of your README for the evaluation part:
-
-```markdown
 ### Evaluating the Model
 
 1. **Evaluation Metrics**
