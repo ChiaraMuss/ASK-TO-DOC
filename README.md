@@ -1,6 +1,4 @@
 
-ASK TO DOC: Leveraging AI for Accessible and Reliable Medical Advice
-
 ## Overview
 
 **ASK TO DOC** is an advanced AI-driven chatbot designed to provide reliable and accurate medical advice. The chatbot leverages a comprehensive training process and a robust dataset of over 250,000 patient-doctor dialogues, utilizing the state-of-the-art Microsoft/DialoGPT-small model to handle complex, multiturn conversations effectively. 
