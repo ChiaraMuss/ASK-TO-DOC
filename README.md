@@ -562,7 +562,7 @@ _tensors='pt').to(device)
 
 ## Security Measures
 
-Comprehensive security measures have been implemented to protect user data and ensure safe interactions. These include:
+Comprehensive security measures that can be implemented to protect user data and ensure safe interactions. These include:
 
 - Data Protection and Privacy
 - Authentication and Authorization
