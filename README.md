@@ -596,9 +596,7 @@ This research received support during the Applies Natural Language Processing co
 
 - **Microsoft/DialoGPT-small**: [DialoGPT: Large-Scale Generative Pre-training for Conversational Response Generation](https://arxiv.org/abs/1911.00536)
 - **Hugging Face Transformers**: [Transformers Documentation](https://huggingface.co/transformers/)
-- **TensorBoard**: [TensorBoard Documentation](https://www.tensorflow.org/tensorboard)
 - **Microsoft/DialoGPT-small**: [DialoGPT: Large-Scale Generative Pre-training for Conversational Response Generation](https://arxiv.org/abs/1911.00536)
-- **Hugging Face Transformers**: [Transformers Documentation](https://huggingface.co/transformers/)
 - **TensorBoard**: [TensorBoard Documentation](https://www.tensorflow.org/tensorboard)
 - **BLEU Score**: [BLEU: A Method for Automatic Evaluation of Machine Translation](https://www.aclweb.org/anthology/P02-1040/)
 - **ROUGE Score**: [ROUGE: A Package for Automatic Evaluation of Summaries](https://www.aclweb.org/anthology/W04-1013/)
