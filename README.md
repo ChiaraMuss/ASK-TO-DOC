@@ -30,7 +30,7 @@
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/ask-to-doc.git
+   git clone https://github.com/ChiaraMuss/ask-to-doc.git
    cd ask-to-doc
    ```
 
