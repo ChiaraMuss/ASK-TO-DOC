@@ -590,7 +590,7 @@ Future plans for the **ASK TO DOC** chatbot include:
 
 ## Acknowledgements
 
-This research received support during the Applies Natural Language Processing course, instructed by Professors Staiano Jacopo and Penzo Nicolò.
+This research received support during the Applied Natural Language Processing course, instructed by Professors Staiano Jacopo and Penzo Nicolò.
 
 ## References
 
