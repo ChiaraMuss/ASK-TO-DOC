@@ -232,8 +232,8 @@
    print(f'Using device: {device}')
 
    # Load tokenizer and model from the saved directory
-   tokenizer = AutoTokenizer.from_pretrained('./trained_medical_chatbot3epoch')
-   model = AutoModelForCausalLM.from_pretrained('./trained_medical_chatbot3epoch').to(device)
+   tokenizer = AutoTokenizer.from_pretrained('./trained_medical_chatbot')
+   model = AutoModelForCausalLM.from_pretrained('./trained_medical_chatbot').to(device)
 
    # Set up logging
    logging.basicConfig(
