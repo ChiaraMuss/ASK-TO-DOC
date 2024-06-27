@@ -34,13 +34,7 @@
    cd ask-to-doc
    ```
 
-2. **Install Dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Set Up Google Colab for Training**
+2. **Set Up Google Colab for Training**
 
    - Mount your Google Drive
    - Ensure the training dataset and model checkpoints are in your Google Drive
