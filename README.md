@@ -25,19 +25,6 @@
 - Cryptography
 - Google Colab (for training)
 
-### Installation Steps
-
-1. **Clone the Repository**
-
-   ```bash
-   git clone https://github.com/ChiaraMuss/ask-to-doc.git
-   cd ask-to-doc
-   ```
-
-2. **Set Up Google Colab for Training**
-
-   - Mount your Google Drive
-   - Ensure the training dataset and model checkpoints are in your Google Drive
 
 ## Usage
 
